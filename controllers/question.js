@@ -1,6 +1,7 @@
-import csv from 'csvtojson';
+import csv from "csvtojson";
 
-import Question from '../models/Question';
+import Question from "../models/Question";
+import mongoose from "mongoose";
 
 export const getAllQuestions = async (req, res) => {
   let count = await Question.countDocuments();
@@ -8,8 +9,8 @@ export const getAllQuestions = async (req, res) => {
 
   if (page) {
     Question.find({})
-      .populate({ path: 'category', model: 'Category' })
-      .populate({ path: 'created_by', model: 'User' })
+      .populate({ path: "category", model: "Category" })
+      .populate({ path: "created_by", model: "User" })
       .skip((page ? page - 1 : 0) * 10)
       .limit(10)
       .then((data) => {
@@ -24,8 +25,8 @@ export const getAllQuestions = async (req, res) => {
   }
 
   Question.find({})
-    .populate({ path: 'category', model: 'Category' })
-    .populate({ path: 'created_by', model: 'User' })
+    .populate({ path: "category", model: "Category" })
+    .populate({ path: "created_by", model: "User" })
     .then((data) => {
       res.status(200).json({
         data,
@@ -41,8 +42,8 @@ export const createQuestion = (req, res) => {
     .save()
     .then((question) => {
       Question.findOne({ _id: question._id })
-        .populate({ path: 'category', model: 'Category' })
-        .populate({ path: 'created_by', model: 'User' })
+        .populate({ path: "category", model: "Category" })
+        .populate({ path: "created_by", model: "User" })
         .then((ques) => {
           res.status(200).json({ question: ques });
         });
@@ -62,11 +63,11 @@ export const updateQuestion = (req, res) => {
       category: req.body.category,
       updated_at: Date.now(),
     },
-    { new: true, useFindAndModify: true },
+    { new: true, useFindAndModify: true }
   )
-    .populate({ path: 'category', model: 'Category' })
-    .populate({ path: 'updated_by', model: 'User' })
-    .populate({ path: 'created_by', model: 'User' })
+    .populate({ path: "category", model: "Category" })
+    .populate({ path: "updated_by", model: "User" })
+    .populate({ path: "created_by", model: "User" })
     .then((data) => {
       res.status(200).json({ data });
     })
@@ -89,16 +90,16 @@ export const importCsvQuestions = async (req, res) => {
   try {
     let questionData = [];
 
-    await csv({ output: 'line' })
+    await csv({ output: "line" })
       .fromString(req.body)
-      .subscribe((csvLine) => {
-        const row = csvLine.split(',');
+      .subscribe(async (csvLine) => {
+        const row = csvLine.split(",");
         const newQuestion = {
           question: row[0],
           answers: [row[1], row[2], row[3], row[4]],
           correctAnswer: row[5],
           level: row[6],
-          category: row[7],
+          category: mongoose.Types.ObjectId(row[7]),
         };
 
         questionData.push(newQuestion);
