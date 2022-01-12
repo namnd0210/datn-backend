@@ -1,12 +1,12 @@
-import AssignmentResult from '../models/AssignmentResult';
+import AssignmentResult from "../models/AssignmentResult";
 
 export const getResultByUserId = async (req, res) => {
   let count = await AssignmentResult.countDocuments();
   const id = req.params.id;
   AssignmentResult.find({ created_by: id })
-    .populate({ path: 'created_by', model: 'User', select: 'name' })
-    .populate({ path: 'assignment', model: 'Assignment' })
-    .populate({ path: 'class', model: 'Class' })
+    .populate({ path: "created_by", model: "User", select: "name" })
+    .populate({ path: "assignment", model: "Assignment" })
+    .populate({ path: "class", model: "Class" })
     .then((data) => {
       res.status(200).json({
         data,
@@ -19,9 +19,9 @@ export const getResultByUserId = async (req, res) => {
 export const getResultByAssignmentId = async (req, res) => {
   const id = req.params.id;
   AssignmentResult.findOne({ assignment: id })
-    .populate({ path: 'created_by', model: 'User', select: 'name' })
-    .populate({ path: 'assignment', model: 'Assignment' })
-    .populate({ path: 'class', model: 'Class' })
+    .populate({ path: "created_by", model: "User", select: "name" })
+    .populate({ path: "assignment", model: "Assignment" })
+    .populate({ path: "class", model: "Class" })
     .then((data) => {
       res.status(200).json({
         data,
@@ -33,9 +33,9 @@ export const getResultByAssignmentId = async (req, res) => {
 export const getResultByAssignmentAndUserId = async (req, res) => {
   const { assignmentId, userId } = req.params;
   AssignmentResult.findOne({ created_by: userId, assignment: assignmentId })
-    .populate({ path: 'created_by', model: 'User', select: 'name' })
-    .populate({ path: 'assignment', model: 'Assignment' })
-    .populate({ path: 'class', model: 'Class' })
+    .populate({ path: "created_by", model: "User", select: "name" })
+    .populate({ path: "assignment", model: "Assignment" })
+    .populate({ path: "class", model: "Class" })
     .then((data) => {
       res.status(200).json({
         data: data ?? {},
@@ -47,9 +47,9 @@ export const getResultByAssignmentAndUserId = async (req, res) => {
 export const getResultById = async (req, res) => {
   const id = req.params.id;
   AssignmentResult.findOne({ _id: id })
-    .populate({ path: 'created_by', model: 'User', select: 'name' })
-    .populate({ path: 'assignment', model: 'Assignment' })
-    .populate({ path: 'class', model: 'Class' })
+    .populate({ path: "created_by", model: "User", select: "name" })
+    .populate({ path: "assignment", model: "Assignment" })
+    .populate({ path: "class", model: "Class" })
     .then((data) => {
       res.status(200).json({
         data,
@@ -62,9 +62,16 @@ export const updateResult = async (req, res) => {
   const id = req.body._id;
   AssignmentResult.findByIdAndUpdate(
     id,
-    { files: req.body.files, point: req.body.point, comments: req.body.comments },
-    { new: true, useFindAndModify: true },
+    {
+      files: req.body.files,
+      point: req.body.point,
+      comments: req.body.comments,
+    },
+    { new: true, useFindAndModify: true }
   )
+    .populate({ path: "created_by", model: "User", select: "name" })
+    .populate({ path: "assignment", model: "Assignment" })
+    .populate({ path: "class", model: "Class" })
     .then((data) => {
       res.status(200).json({
         data,
@@ -79,9 +86,9 @@ export const createResult = (req, res) => {
     .save()
     .then((assignmentRes) => {
       AssignmentResult.findOne({ _id: assignmentRes._id })
-        .populate({ path: 'assignment', model: 'Assignment' })
-        .populate({ path: 'class', model: 'Class' })
-        .populate({ path: 'created_by', model: 'User' })
+        .populate({ path: "assignment", model: "Assignment" })
+        .populate({ path: "class", model: "Class" })
+        .populate({ path: "created_by", model: "User" })
         .then((c) => {
           res.status(200).json({ data: c });
         });
